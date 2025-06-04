@@ -49,6 +49,7 @@ void multiplexerSetup() {
   pinMode(SX1509_INTERRUPT_PIN, INPUT_PULLUP);
 
   //Wire.begin(sdaPin, sclPin);
+  Wire.begin();
 
   // Call io.begin(<address>) to initialize the SX1509. If it
   // successfully communicates, it'll return 1.
@@ -111,6 +112,10 @@ void multiplexerSetup() {
     delay(100);
     io.digitalWrite(SX1509_BUTTON7LED, HIGH);
     io.digitalWrite(SX1509_BUTTON8LED, HIGH);
+    delay(100);
+    io.digitalWrite(SX1509_BUTTON7LED, LOW);
+    io.digitalWrite(SX1509_BUTTON8LED, LOW);
+    
   }
   //io.pinMode(SX1509_WHITELED1, ANALOG_OUTPUT);
 }
@@ -122,12 +127,30 @@ void setup() {
   pinMode(21, INPUT_PULLUP);
   pinMode(20, INPUT_PULLUP);
   pinMode(19, INPUT_PULLUP);*/
+  pinMode(13, OUTPUT);
+  digitalWrite(13, 1);
+  delay(200);
+  digitalWrite(13, 0);
+  delay(200);
+  
+
   Keyboard.begin();
-  pinMode(16, OUTPUT);  
+  
   Serial.begin(115200);
-  while (!Serial);
+
+  digitalWrite(13, 1);
+  delay(200);
+  digitalWrite(13, 0);
+  delay(200);
+  
+  
+  //while (!Serial);
   multiplexerSetup();
   Serial.println("hoi");
+  digitalWrite(13, 1);
+  delay(200);
+  digitalWrite(13, 0);
+  delay(200);
 }
 
 void doMultiplexedButtons() {
@@ -184,7 +207,7 @@ void doMultiplexedButtons() {
 
 void loop() {
   currentMillis = millis();
-
+  Serial.print(".");
   if (buttonChanges) {
     buttonChanges = 0;
     doMultiplexedButtons();
