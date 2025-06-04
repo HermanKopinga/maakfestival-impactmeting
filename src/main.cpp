@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Bounce.h>
 #include <SparkFunSX1509.h>  // Library added manually because that's the platformio way if it is not in the standard catalog?
+                             // Github: https://github.com/sparkfun/SparkFun_SX1509_Arduino_Library
 #include <Wire.h>
 
 // Multiplexer chip sx1509 stuff.
@@ -38,10 +39,10 @@ Bounce button4 = Bounce(19, 20);
 unsigned long lastAction = 0;
 unsigned long currentMillis = 0;
 
-byte buttonChanges = 1;
+byte buttonFALLINGs = 1;
 
 void processButtons() {
-  buttonChanges = 1;
+  buttonFALLINGs = 1;
 }
 
 void multiplexerSetup() {
@@ -80,14 +81,14 @@ void multiplexerSetup() {
   io.pinMode(SX1509_BUTTON8BUTTON, INPUT_PULLUP);
 
 
-  io.enableInterrupt(SX1509_BUTTON1BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON2BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON3BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON4BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON5BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON6BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON7BUTTON, CHANGE);
-  io.enableInterrupt(SX1509_BUTTON8BUTTON, CHANGE);
+  io.enableInterrupt(SX1509_BUTTON1BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON2BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON3BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON4BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON5BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON6BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON7BUTTON, FALLING);
+  io.enableInterrupt(SX1509_BUTTON8BUTTON, FALLING);
 
   io.debouncePin(SX1509_BUTTON1BUTTON);  
   io.debouncePin(SX1509_BUTTON2BUTTON);  
@@ -201,15 +202,13 @@ void doMultiplexedButtons() {
     Keyboard.print(currentMillis/10);
     Keyboard.println(" h");
   }
-
 }
-
 
 void loop() {
   currentMillis = millis();
   Serial.print(".");
-  if (buttonChanges) {
-    buttonChanges = 0;
+  if (buttonFALLINGs) {
+    buttonFALLINGs = 0;
     doMultiplexedButtons();
   }
 
@@ -229,5 +228,3 @@ void loop() {
   }
 
 }
-
-
