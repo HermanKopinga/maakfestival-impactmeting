@@ -7,3 +7,4 @@ Hardware:
   - Teensy 3.2 (blijkbaar bijna vintage microcontroller, PRJC verkoopt alleen de 4.0 nog)
   - SX1509 multiplexer chip, super leuk ding!
 
+![Eerste versie](https://github.com/HermanKopinga/maakfestival-impactmeting/blob/main/eerste.jpg)
