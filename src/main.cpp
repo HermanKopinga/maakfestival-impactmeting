@@ -24,7 +24,6 @@ const byte SX1509_BUTTON7BUTTON = 3;
 const byte SX1509_BUTTON8LED = 0;
 const byte SX1509_BUTTON8BUTTON = 1;
 
-
 const byte BUTTON1BUTTON = 28;
 const byte BUTTON2BUTTON = 28;
 const byte BUTTON3BUTTON = 28;
@@ -41,10 +40,10 @@ const byte BUTTON2LED = 25;
 const byte BUTTON3LED = 25;
 const byte BUTTON4LED = 25;
 const byte BUTTON5LED = 25;
-const byte BUTTON6LED = 25;
-const byte BUTTON7LED = 25;
-const byte BUTTON8LED = 25;
-const byte BUTTON9LED = 25;
+const byte BUTTON6LED = 5;
+const byte BUTTON7LED = 32;
+const byte BUTTON8LED = 6;
+const byte BUTTON9LED = 9;
 const byte BUTTON10LED = 25;
 
 const byte SX1509_INTERRUPT_PIN = 20;
@@ -75,7 +74,6 @@ const byte numberOfButtons = 22;
 const byte numberOfStates = 1;
 const byte active = 0;
 byte state[numberOfStates][numberOfButtons];
-
 
 void processButtons() {
  buttonPushed = 1;
@@ -235,31 +233,37 @@ void doMultiplexedButtons() {
 
   if (intStatus & (1 << SX1509_BUTTON1BUTTON)) {
     Serial.println("Button 1 pressed!");
+    io.digitalWrite(SX1509_BUTTON1LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" a");
   }
   if (intStatus & (1 << SX1509_BUTTON2BUTTON)) {
     Serial.println("Button 2 pressed!");
+    io.digitalWrite(SX1509_BUTTON2LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" b");
   }
   if (intStatus & (1 << SX1509_BUTTON3BUTTON)) {
     Serial.println("Button 3 pressed!");
+    io.digitalWrite(SX1509_BUTTON3LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" c");
   }
   if (intStatus & (1 << SX1509_BUTTON4BUTTON)) {
     Serial.println("Button 4 pressed!");
+    io.digitalWrite(SX1509_BUTTON4LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" d");
   }
   if (intStatus & (1 << SX1509_BUTTON5BUTTON)) {
     Serial.println("Button 5 pressed!");
+    io.digitalWrite(SX1509_BUTTON5LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" e");
   }
   if (intStatus & (1 << SX1509_BUTTON6BUTTON)) {
     Serial.println("Button 6 pressed!");
+    io.digitalWrite(SX1509_BUTTON6LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" f");
   }
