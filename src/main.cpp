@@ -204,6 +204,7 @@ void doMultiplexedButtons() {
   }
   if (intStatus & (1 << SX1509_BUTTON7BUTTON)) {
     Serial.println("Button 7 pressed!");
+    io.digitalWrite(SX1509_BUTTON7LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" g");
   }
