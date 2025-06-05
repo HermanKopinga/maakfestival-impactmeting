@@ -53,6 +53,21 @@ void processButtons() {
  buttonPushed = 1;
 }
 
+// Helper function to map LED number to SX1509_BUTTONxLED constant
+int getLedConstant(int ledNumber) {
+  switch (ledNumber) {
+    case 1: return SX1509_BUTTON1LED;
+    case 2: return SX1509_BUTTON2LED;
+    case 3: return SX1509_BUTTON3LED;
+    case 4: return SX1509_BUTTON4LED;
+    case 5: return SX1509_BUTTON5LED;
+    case 6: return SX1509_BUTTON6LED;
+    case 7: return SX1509_BUTTON7LED;
+    case 8: return SX1509_BUTTON8LED;
+    default: return -1;
+  }
+}
+
 void multiplexerSetup() {
   // The SX1509 interrupt is active-low.
   pinMode(SX1509_INTERRUPT_PIN, INPUT_PULLUP);
@@ -109,25 +124,26 @@ void multiplexerSetup() {
   io.debouncePin(SX1509_BUTTON6BUTTON);     
   io.debouncePin(SX1509_BUTTON7BUTTON);   
   io.debouncePin(SX1509_BUTTON8BUTTON);
-  
+
   attachInterrupt(digitalPinToInterrupt(SX1509_INTERRUPT_PIN), processButtons, FALLING);
 
-  // Blink the LED a few times before we start:
-  for (int i = 0; i < 2; i++) {
-    // Use io.digitalWrite(<pin>, <LOW | HIGH>) to set an
-    // SX1509 pin either HIGH or LOW:
-    io.digitalWrite(SX1509_BUTTON7LED, HIGH);
-    io.digitalWrite(SX1509_BUTTON8LED, HIGH);
-    delay(100);
-    io.digitalWrite(SX1509_BUTTON7LED, LOW);
-    io.digitalWrite(SX1509_BUTTON8LED, LOW);
-    delay(100);
-    io.digitalWrite(SX1509_BUTTON7LED, HIGH);
-    io.digitalWrite(SX1509_BUTTON8LED, HIGH);
-    delay(100);
-    io.digitalWrite(SX1509_BUTTON7LED, LOW);
-    io.digitalWrite(SX1509_BUTTON8LED, LOW);
+  // Blink the LEDs a few times before we start:
+  for (int i = 0; i < 4; i++) {
+    // Walk LEDs from 1 to 8
+    for (int i = 1; i <= 8; i++) {
+      // Turn off previous LED (if not the first)
+      if (i > 1) {
+        io.digitalWrite(getLedConstant(i - 1), LOW);
+      } else {
+        io.digitalWrite(getLedConstant(8), LOW); // wrap around
+      }
+
+      io.digitalWrite(getLedConstant(i), HIGH);
+
+      delay(40);
+    }
   }
+  io.digitalWrite(SX1509_BUTTON8LED, LOW);
   //io.pinMode(SX1509_WHITELED1, ANALOG_OUTPUT);
 }
 
