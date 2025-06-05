@@ -28,23 +28,26 @@ const byte BUTTON1BUTTON = 28;
 const byte BUTTON2BUTTON = 28;
 const byte BUTTON3BUTTON = 28;
 const byte BUTTON4BUTTON = 28;
-const byte BUTTON5BUTTON = 28;
-const byte BUTTON6BUTTON = 28;
+const byte BUTTON5BUTTON = 24;
+const byte BUTTON6BUTTON = 14;
 const byte BUTTON7BUTTON = 28;
 const byte BUTTON8BUTTON = 27;
 const byte BUTTON9BUTTON = 26;
-const byte BUTTON10BUTTON = 28;
+const byte BUTTON10BUTTON = 11;
 
-const byte BUTTON1LED = 25;
-const byte BUTTON2LED = 25;
-const byte BUTTON3LED = 25;
-const byte BUTTON4LED = 25;
+const byte BUTTON1LED = 3;
+const byte BUTTON2LED = 23;
+const byte BUTTON3LED = 22;
+const byte BUTTON4LED = 21;
 const byte BUTTON5LED = 25;
 const byte BUTTON6LED = 5;
 const byte BUTTON7LED = 32;
 const byte BUTTON8LED = 6;
 const byte BUTTON9LED = 9;
-const byte BUTTON10LED = 25;
+const byte BUTTON10LED = 10;
+
+const byte BUTTONGOBUTTON = 12;
+const byte BUTTONGOLED = 4;
 
 const byte SX1509_INTERRUPT_PIN = 20;
 
@@ -62,6 +65,7 @@ Bounce button6 = Bounce(BUTTON7BUTTON, 20);
 Bounce button7 = Bounce(BUTTON8BUTTON, 20);
 Bounce button8 = Bounce(BUTTON9BUTTON, 20);
 Bounce button9 = Bounce(BUTTON10BUTTON, 20);
+Bounce buttongo = Bounce(BUTTONGOBUTTON, 20);
 
 unsigned long lastAction = 0;
 unsigned long currentMillis = 0;
@@ -105,6 +109,7 @@ void multiplexerSetup() {
   // successfully communicates, it'll return 1.
   if (io.begin(SX1509_ADDRESS) == false) {
     Serial.println("Failed to communicate. Check wiring and address of SX1509.");
+    digitalWrite(3, HIGH);  // If we failed to communicate, turn the pin 13 LED on
     digitalWrite(22, HIGH);  // If we failed to communicate, turn the pin 13 LED on
     while (1) {
       digitalWrite(13, 1);
@@ -185,6 +190,7 @@ void setup() {
   pinMode(BUTTON8BUTTON, INPUT_PULLUP);
   pinMode(BUTTON9BUTTON, INPUT_PULLUP);
   pinMode(BUTTON10BUTTON, INPUT_PULLUP);
+  pinMode(BUTTONGOBUTTON, INPUT_PULLUP);
   
   pinMode(BUTTON1LED, OUTPUT);
   pinMode(BUTTON2LED, OUTPUT);
@@ -196,6 +202,7 @@ void setup() {
   pinMode(BUTTON8LED, OUTPUT);
   pinMode(BUTTON9LED, OUTPUT);
   pinMode(BUTTON10LED, OUTPUT);
+  pinMode(BUTTONGOLED, OUTPUT);
   
   pinMode(13, OUTPUT);
   digitalWrite(13, 1);
@@ -213,8 +220,6 @@ void setup() {
   digitalWrite(13, 0);
   delay(200);
   
-  
-  //while (!Serial);
   multiplexerSetup();
   Serial.println("hoi");
   digitalWrite(13, 1);
@@ -281,6 +286,48 @@ void doMultiplexedButtons() {
   }
 }
 
+void disco () {
+  // Blink the LEDs a few times before we start:
+  for (int i = 0; i < 4; i++) {
+    // Walk LEDs from 1 to 8
+    for (int i = 1; i <= 8; i++) {
+      // Turn off previous LED (if not the first)
+      if (i > 1) {
+        io.digitalWrite(getLedConstant(i - 1), LOW);
+      } else {
+        io.digitalWrite(getLedConstant(8), LOW); // wrap around
+      }
+
+      io.digitalWrite(getLedConstant(i), HIGH);
+
+      delay(40);
+    }
+  }
+  io.digitalWrite(SX1509_BUTTON8LED, LOW);
+
+  io.digitalWrite(SX1509_BUTTON1LED, LOW);
+  io.digitalWrite(SX1509_BUTTON2LED, LOW);
+  io.digitalWrite(SX1509_BUTTON3LED, LOW);
+  io.digitalWrite(SX1509_BUTTON4LED, LOW);
+  io.digitalWrite(SX1509_BUTTON5LED, LOW);
+  io.digitalWrite(SX1509_BUTTON6LED, LOW);
+  io.digitalWrite(SX1509_BUTTON7LED, LOW);
+  io.digitalWrite(SX1509_BUTTON8LED, LOW);
+  analogWrite(BUTTON1LED, 0);
+  analogWrite(BUTTON2LED, 0);
+  analogWrite(BUTTON3LED, 0);
+  analogWrite(BUTTON4LED, 0);
+  analogWrite(BUTTON5LED, 0);
+  analogWrite(BUTTON6LED, 0);
+  analogWrite(BUTTON7LED, 0);
+  analogWrite(BUTTON8LED, 0);
+  analogWrite(BUTTON9LED, 0);
+  analogWrite(BUTTON10LED, 0);
+  analogWrite(BUTTONGOLED, 0);
+
+
+}
+
 void loop() {
   currentMillis = millis();
 
@@ -294,6 +341,7 @@ void loop() {
   button7.update();
   button8.update();
   button9.update();
+  buttongo.update();
 
   Serial.print(".");
   if  (buttonPushed) {
@@ -367,5 +415,12 @@ void loop() {
     Keyboard.println(" 10");
     lastAction = currentMillis;
     analogWrite(BUTTON10LED, 160);
+  }
+  if (buttongo.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" !");
+    lastAction = currentMillis;
+    analogWrite(BUTTONGOLED, 255);
+    disco();
   }
 }
