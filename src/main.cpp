@@ -24,17 +24,45 @@ const byte SX1509_BUTTON7BUTTON = 3;
 const byte SX1509_BUTTON8LED = 0;
 const byte SX1509_BUTTON8BUTTON = 1;
 
+
+const byte BUTTON1BUTTON = 28;
+const byte BUTTON2BUTTON = 28;
+const byte BUTTON3BUTTON = 28;
+const byte BUTTON4BUTTON = 28;
+const byte BUTTON5BUTTON = 28;
+const byte BUTTON6BUTTON = 28;
+const byte BUTTON7BUTTON = 28;
+const byte BUTTON8BUTTON = 27;
+const byte BUTTON9BUTTON = 26;
+const byte BUTTON10BUTTON = 28;
+
+const byte BUTTON1LED = 25;
+const byte BUTTON2LED = 25;
+const byte BUTTON3LED = 25;
+const byte BUTTON4LED = 25;
+const byte BUTTON5LED = 25;
+const byte BUTTON6LED = 25;
+const byte BUTTON7LED = 25;
+const byte BUTTON8LED = 25;
+const byte BUTTON9LED = 25;
+const byte BUTTON10LED = 25;
+
 const byte SX1509_INTERRUPT_PIN = 20;
 
 #define sdaPin 18
 #define sclPin 19
 SX1509 io;
 
-Bounce button0 = Bounce(23, 20);
-Bounce button1 = Bounce(22, 20);  // 10 ms debounce time is appropriate
-Bounce button2 = Bounce(21, 20);  // for most mechanical pushbuttons
-Bounce button3 = Bounce(20, 20);  // These feel noisy, 20ms it is.
-Bounce button4 = Bounce(19, 20);
+Bounce button0 = Bounce(BUTTON1BUTTON, 20);
+Bounce button1 = Bounce(BUTTON2BUTTON, 20);  // 10 ms debounce time is appropriate
+Bounce button2 = Bounce(BUTTON3BUTTON, 20);  // for most mechanical pushbuttons
+Bounce button3 = Bounce(BUTTON4BUTTON, 20);  // These feel noisy, 20ms it is.
+Bounce button4 = Bounce(BUTTON5BUTTON, 20);
+Bounce button5 = Bounce(BUTTON6BUTTON, 20);
+Bounce button6 = Bounce(BUTTON7BUTTON, 20);
+Bounce button7 = Bounce(BUTTON8BUTTON, 20);
+Bounce button8 = Bounce(BUTTON9BUTTON, 20);
+Bounce button9 = Bounce(BUTTON10BUTTON, 20);
 
 unsigned long lastAction = 0;
 unsigned long currentMillis = 0;
@@ -149,11 +177,28 @@ void multiplexerSetup() {
 
 
 void setup() {
-  /*pinMode(23, INPUT_PULLUP);
-  pinMode(22, INPUT_PULLUP);
-  pinMode(21, INPUT_PULLUP);
-  pinMode(20, INPUT_PULLUP);
-  pinMode(19, INPUT_PULLUP);*/
+  pinMode(BUTTON1BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON2BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON3BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON4BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON5BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON6BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON7BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON8BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON9BUTTON, INPUT_PULLUP);
+  pinMode(BUTTON10BUTTON, INPUT_PULLUP);
+  
+  pinMode(BUTTON1LED, OUTPUT);
+  pinMode(BUTTON2LED, OUTPUT);
+  pinMode(BUTTON3LED, OUTPUT);
+  pinMode(BUTTON4LED, OUTPUT);
+  pinMode(BUTTON5LED, OUTPUT);
+  pinMode(BUTTON6LED, OUTPUT);
+  pinMode(BUTTON7LED, OUTPUT);
+  pinMode(BUTTON8LED, OUTPUT);
+  pinMode(BUTTON9LED, OUTPUT);
+  pinMode(BUTTON10LED, OUTPUT);
+  
   pinMode(13, OUTPUT);
   digitalWrite(13, 1);
   delay(200);
@@ -234,6 +279,18 @@ void doMultiplexedButtons() {
 
 void loop() {
   currentMillis = millis();
+
+  button0.update();
+  button1.update();    
+  button2.update();
+  button3.update();  
+  button4.update(); 
+  button5.update();
+  button6.update();
+  button7.update();
+  button8.update();
+  button9.update();
+
   Serial.print(".");
   if  (buttonPushed) {
     buttonPushed = 0;
@@ -248,10 +305,63 @@ void loop() {
   }
   
   if (button0.fallingEdge()) {
-    //Keyboard.print(currentMillis/10);
-    //Keyboard.println(" a");
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 1");
     lastAction = currentMillis;
-    analogWrite(16, 160);
+    analogWrite(BUTTON1LED, 160);
   }
-
+  if (button1.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 2");
+    lastAction = currentMillis;
+    analogWrite(BUTTON2LED, 160);
+  }
+  if (button2.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 3");
+    lastAction = currentMillis;
+    analogWrite(BUTTON3LED, 160);
+  }
+  if (button3.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 4");
+    lastAction = currentMillis;
+    analogWrite(BUTTON4LED, 160);
+  }
+  if (button4.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 5");
+    lastAction = currentMillis;
+    analogWrite(BUTTON5LED, 160);
+  }
+  if (button5.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 6");
+    lastAction = currentMillis;
+    analogWrite(BUTTON6LED, 160);
+  }
+  if (button6.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 7");
+    lastAction = currentMillis;
+    analogWrite(BUTTON7LED, 160);
+  }
+  if (button7.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 8");
+    lastAction = currentMillis;
+    analogWrite(BUTTON8LED, 160);
+  }
+  if (button8.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 9");
+    lastAction = currentMillis;
+    analogWrite(BUTTON9LED, 160);
+  }
+  if (button9.fallingEdge()) {
+    Keyboard.print(currentMillis/10);
+    Keyboard.println(" 10");
+    lastAction = currentMillis;
+    analogWrite(BUTTON10LED, 160);
+  }
 }
