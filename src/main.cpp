@@ -5,30 +5,30 @@
 #include <Wire.h>
 
 // Multiplexer chip sx1509 stuff.
-const byte SX1509_ADDRESS = 0x3E;  // SX1509 I2C address
+const byte SX1509_ADDRESS = 0x3E;
 
-const byte SX1509_BUTTON1LED = 14;     // (draining current)
-const byte SX1509_BUTTON1BUTTON = 15;  // 
-const byte SX1509_BUTTON2LED = 12;     // (draining current)
-const byte SX1509_BUTTON2BUTTON = 13;  // 
-const byte SX1509_BUTTON3LED = 10;     // (draining current)
-const byte SX1509_BUTTON3BUTTON = 11;  // 
-const byte SX1509_BUTTON4LED = 8;     // (draining current)
-const byte SX1509_BUTTON4BUTTON = 9;  // 
-const byte SX1509_BUTTON5LED = 6;     // (draining current)
-const byte SX1509_BUTTON5BUTTON = 7;  // 
-const byte SX1509_BUTTON6LED = 4;     // (draining current)
-const byte SX1509_BUTTON6BUTTON = 5;  // 
-const byte SX1509_BUTTON7LED = 2;     // (draining current)
-const byte SX1509_BUTTON7BUTTON = 3;  // 
-const byte SX1509_BUTTON8LED = 0;     // (draining current)
-const byte SX1509_BUTTON8BUTTON = 1;  // 
+const byte SX1509_BUTTON1LED = 14;     
+const byte SX1509_BUTTON1BUTTON = 15;
+const byte SX1509_BUTTON2LED = 12;
+const byte SX1509_BUTTON2BUTTON = 13;
+const byte SX1509_BUTTON3LED = 10;
+const byte SX1509_BUTTON3BUTTON = 11;
+const byte SX1509_BUTTON4LED = 8;
+const byte SX1509_BUTTON4BUTTON = 9;
+const byte SX1509_BUTTON5LED = 6;
+const byte SX1509_BUTTON5BUTTON = 7;
+const byte SX1509_BUTTON6LED = 4;
+const byte SX1509_BUTTON6BUTTON = 5;
+const byte SX1509_BUTTON7LED = 2;
+const byte SX1509_BUTTON7BUTTON = 3;
+const byte SX1509_BUTTON8LED = 0;
+const byte SX1509_BUTTON8BUTTON = 1;
 
 const byte SX1509_INTERRUPT_PIN = 20;
 
 #define sdaPin 18
 #define sclPin 19
-SX1509 io;  // Create an SX1509 object to be used throughout
+SX1509 io;
 
 Bounce button0 = Bounce(23, 20);
 Bounce button1 = Bounce(22, 20);  // 10 ms debounce time is appropriate
@@ -39,10 +39,18 @@ Bounce button4 = Bounce(19, 20);
 unsigned long lastAction = 0;
 unsigned long currentMillis = 0;
 
-byte buttonFALLINGs = 1;
+byte buttonPushed = 0;
+
+const byte numberOfButtons = 22;
+
+// State store in 2d array.
+const byte numberOfStates = 1;
+const byte active = 0;
+byte state[numberOfStates][numberOfButtons];
+
 
 void processButtons() {
-  buttonFALLINGs = 1;
+ buttonPushed = 1;
 }
 
 void multiplexerSetup() {
@@ -57,11 +65,15 @@ void multiplexerSetup() {
   if (io.begin(SX1509_ADDRESS) == false) {
     Serial.println("Failed to communicate. Check wiring and address of SX1509.");
     digitalWrite(22, HIGH);  // If we failed to communicate, turn the pin 13 LED on
-    while (1)
-      ;  // If we fail to communicate, loop forever.
+    while (1) {
+      digitalWrite(13, 1);
+      delay(200);
+      digitalWrite(13, 0);
+      delay(200);
+    }
   }
 
-  io.debounceTime(20);  // Set debounce time to 32 ms.
+  io.debounceTime(20);  // 10ms is default, 20 is a bit more noisy compatible.
 
   io.pinMode(SX1509_BUTTON1LED, OUTPUT);
   io.pinMode(SX1509_BUTTON1BUTTON, INPUT_PULLUP);
@@ -79,7 +91,6 @@ void multiplexerSetup() {
   io.pinMode(SX1509_BUTTON7BUTTON, INPUT_PULLUP);
   io.pinMode(SX1509_BUTTON8LED, OUTPUT);
   io.pinMode(SX1509_BUTTON8BUTTON, INPUT_PULLUP);
-
 
   io.enableInterrupt(SX1509_BUTTON1BUTTON, FALLING);
   io.enableInterrupt(SX1509_BUTTON2BUTTON, FALLING);
@@ -116,7 +127,6 @@ void multiplexerSetup() {
     delay(100);
     io.digitalWrite(SX1509_BUTTON7LED, LOW);
     io.digitalWrite(SX1509_BUTTON8LED, LOW);
-    
   }
   //io.pinMode(SX1509_WHITELED1, ANALOG_OUTPUT);
 }
@@ -199,6 +209,7 @@ void doMultiplexedButtons() {
   }
   if (intStatus & (1 << SX1509_BUTTON8BUTTON)) {
     Serial.println("Button 8 pressed!");
+    io.digitalWrite(SX1509_BUTTON8LED, HIGH);
     Keyboard.print(currentMillis/10);
     Keyboard.println(" h");
   }
@@ -207,10 +218,9 @@ void doMultiplexedButtons() {
 void loop() {
   currentMillis = millis();
   Serial.print(".");
-  if (buttonFALLINGs) {
-    buttonFALLINGs = 0;
-    doMultiplexedButtons();
-  }
+  if  (buttonPushed) {
+    buttonPushed = 0;
+    doMultiplexedButtons(); }
 
   if (currentMillis - lastAction > 1000) {
     analogWrite(16, 0);    
