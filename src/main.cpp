@@ -73,11 +73,44 @@ unsigned long currentMillis = 0;
 byte buttonPushed = 0;
 
 const byte numberOfButtons = 22;
+const byte sourceSX1509 = 1;
+const byte sourceDirect = 0;
 
-// State store in 2d array.
-const byte numberOfStates = 1;
-const byte active = 0;
-byte state[numberOfStates][numberOfButtons];
+// Store state in couple of arrays.
+byte pInfoActive[numberOfButtons];
+byte pInfoPin[numberOfButtons] = {SX1509_BUTTON1LED,SX1509_BUTTON2LED,SX1509_BUTTON3LED,SX1509_BUTTON4LED,SX1509_BUTTON5LED,SX1509_BUTTON6LED,SX1509_BUTTON7LED,SX1509_BUTTON8LED, 8,9,10,BUTTON1LED,BUTTON2LED,BUTTON3LED,BUTTON4LED,BUTTON5LED,BUTTON6LED,BUTTON7LED,BUTTON8LED,BUTTON9LED,BUTTON10LED,BUTTONGOLED};
+byte pInfoSource[numberOfButtons] = {sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect};
+
+void turnLedOn (byte position) {
+  pInfoActive[position] = 1;
+  if (pInfoSource[position] == sourceSX1509) {
+    io.digitalWrite(pInfoPin[position], HIGH);
+  } else {
+    digitalWrite(pInfoPin[position], 160);
+  }
+}
+
+void turnLedOff (byte position) {
+  pInfoActive[position] = 0;
+  if (pInfoSource[position] == sourceSX1509) {
+    io.digitalWrite(pInfoPin[position], LOW);
+  } else {
+    digitalWrite(pInfoPin[position], 0);
+  }  
+}
+
+void processPress(byte position, const char* output) {
+  if (pInfoActive[position]) {
+    turnLedOff(position);
+    pInfoActive[position] = 0;  
+  } else {
+    turnLedOn(position);
+    pInfoActive[position] = 1;
+    Keyboard.print(currentMillis/10);
+    Keyboard.print(" ");
+    Keyboard.println(output);    
+  }
+}
 
 void processButtons() {
  buttonPushed = 1;
@@ -121,21 +154,21 @@ void multiplexerSetup() {
 
   io.debounceTime(20);  // 10ms is default, 20 is a bit more noisy compatible.
 
-  io.pinMode(SX1509_BUTTON1LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON1LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON1BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON2LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON2LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON2BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON3LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON3LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON3BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON4LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON4LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON4BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON5LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON5LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON5BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON6LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON6LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON6BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON7LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON7LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON7BUTTON, INPUT_PULLUP);
-  io.pinMode(SX1509_BUTTON8LED, OUTPUT);
+  io.pinMode(SX1509_BUTTON8LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON8BUTTON, INPUT_PULLUP);
 
   io.enableInterrupt(SX1509_BUTTON1BUTTON, FALLING);
@@ -210,7 +243,6 @@ void setup() {
   digitalWrite(13, 0);
   delay(200);
   
-
   Keyboard.begin();
   
   Serial.begin(115200);
@@ -238,51 +270,99 @@ void doMultiplexedButtons() {
 
   if (intStatus & (1 << SX1509_BUTTON1BUTTON)) {
     Serial.println("Button 1 pressed!");
-    io.digitalWrite(SX1509_BUTTON1LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" a");
+    if (pInfoActive[1]) {
+      io.digitalWrite(SX1509_BUTTON1LED, LOW);
+      pInfoActive[1] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON1LED, HIGH);
+      pInfoActive[1] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" a");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON2BUTTON)) {
     Serial.println("Button 2 pressed!");
-    io.digitalWrite(SX1509_BUTTON2LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" b");
+    if (pInfoActive[2]) {
+      io.digitalWrite(SX1509_BUTTON2LED, LOW);
+      pInfoActive[2] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON2LED, HIGH);
+      pInfoActive[2] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" b");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON3BUTTON)) {
     Serial.println("Button 3 pressed!");
-    io.digitalWrite(SX1509_BUTTON3LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" c");
+    if (pInfoActive[3]) {
+      io.digitalWrite(SX1509_BUTTON3LED, LOW);
+      pInfoActive[3] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON3LED, HIGH);
+      pInfoActive[3] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" c");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON4BUTTON)) {
     Serial.println("Button 4 pressed!");
-    io.digitalWrite(SX1509_BUTTON4LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" d");
+    if (pInfoActive[4]) {
+      io.digitalWrite(SX1509_BUTTON4LED, LOW);
+      pInfoActive[4] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON4LED, HIGH);
+      pInfoActive[4] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" d");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON5BUTTON)) {
     Serial.println("Button 5 pressed!");
-    io.digitalWrite(SX1509_BUTTON5LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" e");
+    if (pInfoActive[5]) {
+      io.digitalWrite(SX1509_BUTTON5LED, LOW);
+      pInfoActive[5] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON5LED, HIGH);
+      pInfoActive[5] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" e");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON6BUTTON)) {
     Serial.println("Button 6 pressed!");
-    io.digitalWrite(SX1509_BUTTON6LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" f");
+    if (pInfoActive[6]) {
+      io.digitalWrite(SX1509_BUTTON6LED, LOW);
+      pInfoActive[6] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON6LED, HIGH);
+      pInfoActive[6] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" f");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON7BUTTON)) {
     Serial.println("Button 7 pressed!");
-    io.digitalWrite(SX1509_BUTTON7LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" g");
+    if (pInfoActive[7]) {
+      io.digitalWrite(SX1509_BUTTON7LED, LOW);
+      pInfoActive[7] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON7LED, HIGH);
+      pInfoActive[7] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" g");  
+    }    
   }
   if (intStatus & (1 << SX1509_BUTTON8BUTTON)) {
     Serial.println("Button 8 pressed!");
-    io.digitalWrite(SX1509_BUTTON8LED, HIGH);
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" h");
+    if (pInfoActive[8]) {
+      io.digitalWrite(SX1509_BUTTON8LED, LOW);
+      pInfoActive[8] = 0;  
+    } else {
+      io.digitalWrite(SX1509_BUTTON8LED, HIGH);
+      pInfoActive[8] = 1;
+      Keyboard.print(currentMillis/10);
+      Keyboard.println(" h");  
+    }    
   }
 }
 
@@ -357,70 +437,40 @@ void loop() {
   }
   
   if (button0.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 1");
-    lastAction = currentMillis;
-    analogWrite(BUTTON1LED, 160);
+    processPress(11, "1");    
   }
   if (button1.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 2");
-    lastAction = currentMillis;
-    analogWrite(BUTTON2LED, 160);
+    processPress(12, "2");     
   }
   if (button2.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 3");
-    lastAction = currentMillis;
-    analogWrite(BUTTON3LED, 160);
+    processPress(13, "3");     
   }
   if (button3.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 4");
-    lastAction = currentMillis;
-    analogWrite(BUTTON4LED, 160);
+    processPress(14, "4");     
   }
   if (button4.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 5");
-    lastAction = currentMillis;
-    analogWrite(BUTTON5LED, 160);
+    processPress(15, "5");     
   }
   if (button5.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 6");
-    lastAction = currentMillis;
-    analogWrite(BUTTON6LED, 160);
+    processPress(16, "6");     
   }
   if (button6.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 7");
-    lastAction = currentMillis;
-    analogWrite(BUTTON7LED, 160);
+    processPress(17, "7");     
   }
   if (button7.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 8");
-    lastAction = currentMillis;
-    analogWrite(BUTTON8LED, 160);
+    processPress(18, "8");     
   }
   if (button8.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 9");
-    lastAction = currentMillis;
-    analogWrite(BUTTON9LED, 160);
+    processPress(19, "9");     
   }
   if (button9.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" 10");
-    lastAction = currentMillis;
-    analogWrite(BUTTON10LED, 160);
+    processPress(20, "10");    
   }
   if (buttongo.fallingEdge()) {
     Keyboard.print(currentMillis/10);
     Keyboard.println(" !");
     lastAction = currentMillis;
-    analogWrite(BUTTONGOLED, 255);
+    analogWrite(BUTTONGOLED, 160);
     disco();
   }
 }
