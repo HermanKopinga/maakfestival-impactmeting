@@ -270,99 +270,35 @@ void doMultiplexedButtons() {
 
   if (intStatus & (1 << SX1509_BUTTON1BUTTON)) {
     Serial.println("Button 1 pressed!");
-    if (pInfoActive[1]) {
-      io.digitalWrite(SX1509_BUTTON1LED, LOW);
-      pInfoActive[1] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON1LED, HIGH);
-      pInfoActive[1] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" a");  
-    }    
+    processPress(0, "a"); 
   }
   if (intStatus & (1 << SX1509_BUTTON2BUTTON)) {
     Serial.println("Button 2 pressed!");
-    if (pInfoActive[2]) {
-      io.digitalWrite(SX1509_BUTTON2LED, LOW);
-      pInfoActive[2] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON2LED, HIGH);
-      pInfoActive[2] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" b");  
-    }    
+    processPress(1, "b");  
   }
   if (intStatus & (1 << SX1509_BUTTON3BUTTON)) {
     Serial.println("Button 3 pressed!");
-    if (pInfoActive[3]) {
-      io.digitalWrite(SX1509_BUTTON3LED, LOW);
-      pInfoActive[3] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON3LED, HIGH);
-      pInfoActive[3] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" c");  
-    }    
+    processPress(2, "c");         
   }
   if (intStatus & (1 << SX1509_BUTTON4BUTTON)) {
     Serial.println("Button 4 pressed!");
-    if (pInfoActive[4]) {
-      io.digitalWrite(SX1509_BUTTON4LED, LOW);
-      pInfoActive[4] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON4LED, HIGH);
-      pInfoActive[4] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" d");  
-    }    
+    processPress(3, "d");  
   }
   if (intStatus & (1 << SX1509_BUTTON5BUTTON)) {
     Serial.println("Button 5 pressed!");
-    if (pInfoActive[5]) {
-      io.digitalWrite(SX1509_BUTTON5LED, LOW);
-      pInfoActive[5] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON5LED, HIGH);
-      pInfoActive[5] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" e");  
-    }    
+    processPress(4, "e");   
   }
   if (intStatus & (1 << SX1509_BUTTON6BUTTON)) {
     Serial.println("Button 6 pressed!");
-    if (pInfoActive[6]) {
-      io.digitalWrite(SX1509_BUTTON6LED, LOW);
-      pInfoActive[6] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON6LED, HIGH);
-      pInfoActive[6] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" f");  
-    }    
+    processPress(5, "f");    
   }
   if (intStatus & (1 << SX1509_BUTTON7BUTTON)) {
     Serial.println("Button 7 pressed!");
-    if (pInfoActive[7]) {
-      io.digitalWrite(SX1509_BUTTON7LED, LOW);
-      pInfoActive[7] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON7LED, HIGH);
-      pInfoActive[7] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" g");  
-    }    
+    processPress(6, "g");  
   }
   if (intStatus & (1 << SX1509_BUTTON8BUTTON)) {
     Serial.println("Button 8 pressed!");
-    if (pInfoActive[8]) {
-      io.digitalWrite(SX1509_BUTTON8LED, LOW);
-      pInfoActive[8] = 0;  
-    } else {
-      io.digitalWrite(SX1509_BUTTON8LED, HIGH);
-      pInfoActive[8] = 1;
-      Keyboard.print(currentMillis/10);
-      Keyboard.println(" h");  
-    }    
+    processPress(7, "h"); 
   }
 }
 
@@ -437,7 +373,7 @@ void loop() {
   }
   
   if (button0.fallingEdge()) {
-    processPress(11, "1");    
+    processPress(11, "1");
   }
   if (button1.fallingEdge()) {
     processPress(12, "2");     
