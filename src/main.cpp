@@ -99,21 +99,67 @@ void turnLedOff (byte position) {
   }  
 }
 
+void checkQuestion(byte position, byte reset) {
+  byte q1 = 0;
+  byte q2 = 0;
+  byte q3 = 0;
+
+  if (position <= 7) {
+    // Eerste vraag, meerdere mogelijk.
+    // niks doen nog?
+    for (byte i=0;i<=7;i++) {
+      if (pInfoActive[i]) {
+        q1++;
+      }
+    }
+  } else if (position <= 10) {
+    // Tweede vraag, eentje mogelijk.
+    for (byte i=8;i<=10;i++) {
+      pInfoActive[i] = 0;
+      turnLedOff(i);
+      if (pInfoActive[i]) {
+        q2++;
+      }
+    }
+  } else if (position <= 21) {
+    // Cijfer, eentje mogelijk.
+    for (byte i=11;i<=20;i++) {
+      pInfoActive[i] = 0;
+      turnLedOff(i);
+      if (pInfoActive[i]) {
+        q3++;
+      }
+    }
+  }
+  // Dit moet nog, als een van deze knoppen aangesloten is moet q2 ook 1 zijn.
+  if (q1 > 0 && q2 == 0 && q3 == 1) {
+    turnLedOn(21); // BUTTONGOLED
+  }
+}
+
 void processPress(byte position, const char* output) {
   if (pInfoActive[position]) {
+    Serial.print("Button ");
+    Serial.print(position);
+    Serial.print(" pressed, deactivated.");
     turnLedOff(position);
     pInfoActive[position] = 0;  
   } else {
+    Serial.print("Button ");
+    Serial.print(position);
+    Serial.print(" pressed, output: ");
+    Serial.println(output);
+    checkQuestion(position, 0);
     turnLedOn(position);
     pInfoActive[position] = 1;
-    Keyboard.print(currentMillis/10);
+    Keyboard.print(millis()/10);
     Keyboard.print(" ");
     Keyboard.println(output);    
   }
 }
 
 void processButtons() {
- buttonPushed = 1;
+  buttonPushed = 1;
 }
 
 // Helper function to map LED number to SX1509_BUTTONxLED constant
@@ -253,7 +299,7 @@ void setup() {
   delay(200);
   
   multiplexerSetup();
-  Serial.println("hoi");
+  Serial.println("Maakfestival Impact monitor door Herman Kopinga (herman@kopinga.nl)");
   digitalWrite(13, 1);
   delay(200);
   digitalWrite(13, 0);
@@ -340,13 +386,9 @@ void disco () {
   analogWrite(BUTTON9LED, 0);
   analogWrite(BUTTON10LED, 0);
   analogWrite(BUTTONGOLED, 0);
-
-
 }
 
 void loop() {
-  currentMillis = millis();
-
   button0.update();
   button1.update();    
   button2.update();
@@ -359,19 +401,11 @@ void loop() {
   button9.update();
   buttongo.update();
 
-  Serial.print(".");
   if  (buttonPushed) {
     buttonPushed = 0;
-    doMultiplexedButtons(); }
-
-  if (currentMillis - lastAction > 1000) {
-    analogWrite(16, 0);    
-    Serial.println("huh");
-  } else if (currentMillis - lastAction > 500) {
-    Serial.println("jaja");
-    analogWrite(16, 4);
+    doMultiplexedButtons(); 
   }
-  
+
   if (button0.fallingEdge()) {
     processPress(11, "1");
   }
@@ -403,10 +437,7 @@ void loop() {
     processPress(20, "10");    
   }
   if (buttongo.fallingEdge()) {
-    Keyboard.print(currentMillis/10);
-    Keyboard.println(" !");
-    lastAction = currentMillis;
-    analogWrite(BUTTONGOLED, 160);
+    processPress(21, "!");    
     disco();
   }
 }
