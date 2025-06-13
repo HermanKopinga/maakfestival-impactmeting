@@ -97,7 +97,7 @@ void turnLedOn (byte position) {
   if (pInfoSource[position] == sourceSX1509) {
     io.digitalWrite(pInfoPin[position], HIGH);
   } else {
-    digitalWrite(pInfoPin[position], 160);
+    digitalWrite(pInfoPin[position], 255);
   }
 }
 
@@ -125,15 +125,13 @@ void checkQuestion(byte position, byte reset) {
     }
   } else if (position <= 10) {
     // Tweede vraag, eentje mogelijk.
-    for (byte i=8;i<=10;i++) {
+    /*for (byte i=8;i<=10;i++) {
       pInfoActive[i] = 0;
-      turnLedOff(i);3171 !
-      3474 a
-      
+      turnLedOff(i);
       if (pInfoActive[i]) {
         q2++;
       }
-    }
+    }*/
   } else if (position <= 21) {
     // Cijfer, eentje mogelijk.
     for (byte i=11;i<=20;i++) {
@@ -160,9 +158,7 @@ void disco() {
       } else {
         turnLedOff(21); // wrap around
       }
-
       turnLedOn(i);
-
       delay(10);
     }
   }
@@ -381,10 +377,10 @@ void loop() {
   if (buttonq21.fallingEdge()) {
     processPress(8, "x");
   }
-  if (buttonq21.fallingEdge()) {
+  if (buttonq22.fallingEdge()) {
     processPress(9, "y");
   }
-  if (buttonq21.fallingEdge()) {
+  if (buttonq23.fallingEdge()) {
     processPress(10, "z");
   }
   if (button0.fallingEdge()) {
