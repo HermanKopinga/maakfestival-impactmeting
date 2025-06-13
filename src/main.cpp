@@ -151,7 +151,9 @@ byte checkQuestion(byte position) {
 
   // Cijfer, eentje mogelijk.
   for (byte i=11;i<=20;i++) {
-    pInfoActive[i] = 0;
+    if (11 <= position && position <= 21) {
+      pInfoActive[i] = 0;
+    }
     turnLedOff(i);
     if (pInfoActive[i]) {
       answerCount[3]++;
@@ -186,7 +188,7 @@ void disco() {
   for (int i = 0; i < 4; i++) {
     for (int i = 0; i <= 21; i++) {
       // Turn off previous LED (if not the first)
-      if (i > 1) {
+      if (i > 0) {
         turnLedOff(i-1);
       } else {
         turnLedOff(21); // wrap around
@@ -198,12 +200,22 @@ void disco() {
   turnLedOff(21); // wrap around
 }
 
+void printState() {
+  for (byte i = 0; i < numberOfButtons; i++) {
+    Serial.print(" ");
+    Serial.print(pInfoActive[i]);
+  }
+  Serial.println();
+}
+
 void processPress(byte position, const char* output) {
   checkQuestion(position);
   if (pInfoActive[position]) {
     Serial.print("Button ");
     Serial.print(position);
     Serial.print(" pressed, deactivated.");
+    Serial.print(output);
+    printState();
     turnLedOff(position);
     pInfoActive[position] = 0;
     Keyboard.print(millis()/10);
@@ -213,7 +225,8 @@ void processPress(byte position, const char* output) {
     Serial.print("Button ");
     Serial.print(position);
     Serial.print(" pressed, output: ");
-    Serial.println(output);
+    Serial.print(output);
+    printState();
     turnLedOn(position);
     pInfoActive[position] = 1;
     Keyboard.print(millis()/10);
