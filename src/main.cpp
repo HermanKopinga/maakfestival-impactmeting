@@ -56,7 +56,6 @@ const byte BUTTONQ21LED = 16;
 const byte BUTTONQ22LED = 15;
 const byte BUTTONQ23LED = 13;
 
-
 const byte SX1509_INTERRUPT_PIN = 20;
 
 #define sdaPin 18
@@ -140,10 +139,10 @@ byte checkQuestion(byte position) {
   
   // Tweede vraag, eentje mogelijk.
   for (byte i=8;i<=10;i++) {
-    if (8 <= position && position <= 10) {
+    if (whatQuestion(position) == 2) {
       pInfoActive[i] = 0;
+      turnLedOff(i);
     }
-    turnLedOff(i);
     if (pInfoActive[i]) {
       answerCount[2]++;
     }
@@ -151,7 +150,7 @@ byte checkQuestion(byte position) {
 
   // Cijfer, eentje mogelijk.
   for (byte i=11;i<=20;i++) {
-    if (11 <= position && position <= 21) {
+    if (whatQuestion(position) == 3) {
       pInfoActive[i] = 0;
     }
     turnLedOff(i);
@@ -211,27 +210,27 @@ void printState() {
 void processPress(byte position, const char* output) {
   checkQuestion(position);
   if (pInfoActive[position]) {
-    Serial.print("Button ");
-    Serial.print(position);
-    Serial.print(" pressed, deactivated.");
-    Serial.print(output);
-    printState();
     turnLedOff(position);
     pInfoActive[position] = 0;
     Keyboard.print(millis()/10);
     Keyboard.print("-");
     Keyboard.println(output);
-  } else {
     Serial.print("Button ");
     Serial.print(position);
-    Serial.print(" pressed, output: ");
+    Serial.print(" pressed, deactivated ");
     Serial.print(output);
     printState();
+  } else {
     turnLedOn(position);
     pInfoActive[position] = 1;
     Keyboard.print(millis()/10);
     Keyboard.print(" ");
     Keyboard.println(output);
+    Serial.print("Button ");
+    Serial.print(position);
+    Serial.print(" pressed, output: ");
+    Serial.print(output);
+    printState();
   }
 }
 
