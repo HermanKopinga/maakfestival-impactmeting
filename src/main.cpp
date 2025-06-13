@@ -24,10 +24,10 @@ const byte SX1509_BUTTON7BUTTON = 3;
 const byte SX1509_BUTTON8LED = 0;
 const byte SX1509_BUTTON8BUTTON = 1;
 
-const byte BUTTON1BUTTON = 28;
-const byte BUTTON2BUTTON = 28;
-const byte BUTTON3BUTTON = 28;
-const byte BUTTON4BUTTON = 28;
+const byte BUTTON1BUTTON = 7;
+const byte BUTTON2BUTTON = 8;
+const byte BUTTON3BUTTON = 30;
+const byte BUTTON4BUTTON = 29;
 const byte BUTTON5BUTTON = 24;
 const byte BUTTON6BUTTON = 14;
 const byte BUTTON7BUTTON = 28;
@@ -49,6 +49,14 @@ const byte BUTTON10LED = 10;
 const byte BUTTONGOBUTTON = 12;
 const byte BUTTONGOLED = 4;
 
+const byte BUTTONQ21BUTTON = 33;
+const byte BUTTONQ22BUTTON = 17;
+const byte BUTTONQ23BUTTON = 31;
+const byte BUTTONQ21LED = 16;
+const byte BUTTONQ22LED = 15;
+const byte BUTTONQ23LED = 13;
+
+
 const byte SX1509_INTERRUPT_PIN = 20;
 
 #define sdaPin 18
@@ -66,6 +74,9 @@ Bounce button7 = Bounce(BUTTON8BUTTON, 20);
 Bounce button8 = Bounce(BUTTON9BUTTON, 20);
 Bounce button9 = Bounce(BUTTON10BUTTON, 20);
 Bounce buttongo = Bounce(BUTTONGOBUTTON, 20);
+Bounce buttonq21 = Bounce(BUTTONQ21BUTTON, 20);
+Bounce buttonq22 = Bounce(BUTTONQ22BUTTON, 20);
+Bounce buttonq23 = Bounce(BUTTONQ23BUTTON, 20);
 
 unsigned long lastAction = 0;
 unsigned long currentMillis = 0;
@@ -78,7 +89,7 @@ const byte sourceDirect = 0;
 
 // Store state in couple of arrays.
 byte pInfoActive[numberOfButtons];
-byte pInfoPin[numberOfButtons] = {SX1509_BUTTON1LED,SX1509_BUTTON2LED,SX1509_BUTTON3LED,SX1509_BUTTON4LED,SX1509_BUTTON5LED,SX1509_BUTTON6LED,SX1509_BUTTON7LED,SX1509_BUTTON8LED, 8,9,10,BUTTON1LED,BUTTON2LED,BUTTON3LED,BUTTON4LED,BUTTON5LED,BUTTON6LED,BUTTON7LED,BUTTON8LED,BUTTON9LED,BUTTON10LED,BUTTONGOLED};
+byte pInfoPin[numberOfButtons] = {SX1509_BUTTON1LED,SX1509_BUTTON2LED,SX1509_BUTTON3LED,SX1509_BUTTON4LED,SX1509_BUTTON5LED,SX1509_BUTTON6LED,SX1509_BUTTON7LED,SX1509_BUTTON8LED,BUTTONQ21LED,BUTTONQ22LED,BUTTONQ23LED,BUTTON1LED,BUTTON2LED,BUTTON3LED,BUTTON4LED,BUTTON5LED,BUTTON6LED,BUTTON7LED,BUTTON8LED,BUTTON9LED,BUTTON10LED,BUTTONGOLED};
 byte pInfoSource[numberOfButtons] = {sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect};
 
 void turnLedOn (byte position) {
@@ -116,7 +127,9 @@ void checkQuestion(byte position, byte reset) {
     // Tweede vraag, eentje mogelijk.
     for (byte i=8;i<=10;i++) {
       pInfoActive[i] = 0;
-      turnLedOff(i);
+      turnLedOff(i);3171 !
+      3474 a
+      
       if (pInfoActive[i]) {
         q2++;
       }
@@ -135,6 +148,25 @@ void checkQuestion(byte position, byte reset) {
   if (q1 > 0 && q2 == 0 && q3 == 1) {
     turnLedOn(21); // BUTTONGOLED
   }
+}
+
+void disco() {
+  // Blink the LEDs a few times before we start:
+  for (int i = 0; i < 4; i++) {
+    for (int i = 0; i <= 21; i++) {
+      // Turn off previous LED (if not the first)
+      if (i > 1) {
+        turnLedOff(i-1);
+      } else {
+        turnLedOff(21); // wrap around
+      }
+
+      turnLedOn(i);
+
+      delay(10);
+    }
+  }
+  turnLedOff(21); // wrap around
 }
 
 void processPress(byte position, const char* output) {
@@ -162,21 +194,6 @@ void processButtons() {
   buttonPushed = 1;
 }
 
-// Helper function to map LED number to SX1509_BUTTONxLED constant
-int getLedConstant(int ledNumber) {
-  switch (ledNumber) {
-    case 1: return SX1509_BUTTON1LED;
-    case 2: return SX1509_BUTTON2LED;
-    case 3: return SX1509_BUTTON3LED;
-    case 4: return SX1509_BUTTON4LED;
-    case 5: return SX1509_BUTTON5LED;
-    case 6: return SX1509_BUTTON6LED;
-    case 7: return SX1509_BUTTON7LED;
-    case 8: return SX1509_BUTTON8LED;
-    default: return -1;
-  }
-}
-
 void multiplexerSetup() {
   // The SX1509 interrupt is active-low.
   pinMode(SX1509_INTERRUPT_PIN, INPUT_PULLUP);
@@ -189,7 +206,7 @@ void multiplexerSetup() {
   if (io.begin(SX1509_ADDRESS) == false) {
     Serial.println("Failed to communicate. Check wiring and address of SX1509.");
     digitalWrite(3, HIGH);  // If we failed to communicate, turn the pin 13 LED on
-    digitalWrite(22, HIGH);  // If we failed to communicate, turn the pin 13 LED on
+    digitalWrite(22, HIGH);  // If we failed to communicate, turn the pin 22 LED on
     while (1) {
       digitalWrite(13, 1);
       delay(200);
@@ -198,7 +215,7 @@ void multiplexerSetup() {
     }
   }
 
-  io.debounceTime(20);  // 10ms is default, 20 is a bit more noisy compatible.
+  io.debounceTime(20);  // 10ms is default, 20 is a bit more noise compatible.
 
   io.pinMode(SX1509_BUTTON1LED, ANALOG_OUTPUT);
   io.pinMode(SX1509_BUTTON1BUTTON, INPUT_PULLUP);
@@ -237,23 +254,6 @@ void multiplexerSetup() {
 
   attachInterrupt(digitalPinToInterrupt(SX1509_INTERRUPT_PIN), processButtons, FALLING);
 
-  // Blink the LEDs a few times before we start:
-  for (int i = 0; i < 4; i++) {
-    // Walk LEDs from 1 to 8
-    for (int i = 1; i <= 8; i++) {
-      // Turn off previous LED (if not the first)
-      if (i > 1) {
-        io.digitalWrite(getLedConstant(i - 1), LOW);
-      } else {
-        io.digitalWrite(getLedConstant(8), LOW); // wrap around
-      }
-
-      io.digitalWrite(getLedConstant(i), HIGH);
-
-      delay(40);
-    }
-  }
-  io.digitalWrite(SX1509_BUTTON8LED, LOW);
   //io.pinMode(SX1509_WHITELED1, ANALOG_OUTPUT);
 }
 
@@ -270,6 +270,9 @@ void setup() {
   pinMode(BUTTON9BUTTON, INPUT_PULLUP);
   pinMode(BUTTON10BUTTON, INPUT_PULLUP);
   pinMode(BUTTONGOBUTTON, INPUT_PULLUP);
+  pinMode(BUTTONQ21BUTTON, INPUT_PULLUP);
+  pinMode(BUTTONQ22BUTTON, INPUT_PULLUP);
+  pinMode(BUTTONQ23BUTTON, INPUT_PULLUP);
   
   pinMode(BUTTON1LED, OUTPUT);
   pinMode(BUTTON2LED, OUTPUT);
@@ -282,28 +285,34 @@ void setup() {
   pinMode(BUTTON9LED, OUTPUT);
   pinMode(BUTTON10LED, OUTPUT);
   pinMode(BUTTONGOLED, OUTPUT);
+  pinMode(BUTTONQ21LED, OUTPUT);
+  pinMode(BUTTONQ22LED, OUTPUT);
+  pinMode(BUTTONQ23LED, OUTPUT);
+  
   
   pinMode(13, OUTPUT);
   digitalWrite(13, 1);
-  delay(200);
-  digitalWrite(13, 0);
-  delay(200);
   
   Keyboard.begin();
   
   Serial.begin(115200);
 
-  digitalWrite(13, 1);
-  delay(200);
-  digitalWrite(13, 0);
-  delay(200);
-  
   multiplexerSetup();
   Serial.println("Maakfestival Impact monitor door Herman Kopinga (herman@kopinga.nl)");
-  digitalWrite(13, 1);
-  delay(200);
+  
+  // Make sure all leds work, turn them on at start.
+  for (int i = 0; i <= 21; i++) {
+    turnLedOn(i);
+  }
+  delay(500);
+  // Hidden debug feature if 10 is pushed at the start keep showing the LEDS.
+  while (digitalRead(BUTTON10BUTTON) == 0) {
+    delay(200);
+  }
+  for (int i = 0; i <= 21; i++) {
+    turnLedOff(i);
+  }
   digitalWrite(13, 0);
-  delay(200);
 }
 
 void doMultiplexedButtons() {
@@ -348,46 +357,6 @@ void doMultiplexedButtons() {
   }
 }
 
-void disco () {
-  // Blink the LEDs a few times before we start:
-  for (int i = 0; i < 4; i++) {
-    // Walk LEDs from 1 to 8
-    for (int i = 1; i <= 8; i++) {
-      // Turn off previous LED (if not the first)
-      if (i > 1) {
-        io.digitalWrite(getLedConstant(i - 1), LOW);
-      } else {
-        io.digitalWrite(getLedConstant(8), LOW); // wrap around
-      }
-
-      io.digitalWrite(getLedConstant(i), HIGH);
-
-      delay(40);
-    }
-  }
-  io.digitalWrite(SX1509_BUTTON8LED, LOW);
-
-  io.digitalWrite(SX1509_BUTTON1LED, LOW);
-  io.digitalWrite(SX1509_BUTTON2LED, LOW);
-  io.digitalWrite(SX1509_BUTTON3LED, LOW);
-  io.digitalWrite(SX1509_BUTTON4LED, LOW);
-  io.digitalWrite(SX1509_BUTTON5LED, LOW);
-  io.digitalWrite(SX1509_BUTTON6LED, LOW);
-  io.digitalWrite(SX1509_BUTTON7LED, LOW);
-  io.digitalWrite(SX1509_BUTTON8LED, LOW);
-  analogWrite(BUTTON1LED, 0);
-  analogWrite(BUTTON2LED, 0);
-  analogWrite(BUTTON3LED, 0);
-  analogWrite(BUTTON4LED, 0);
-  analogWrite(BUTTON5LED, 0);
-  analogWrite(BUTTON6LED, 0);
-  analogWrite(BUTTON7LED, 0);
-  analogWrite(BUTTON8LED, 0);
-  analogWrite(BUTTON9LED, 0);
-  analogWrite(BUTTON10LED, 0);
-  analogWrite(BUTTONGOLED, 0);
-}
-
 void loop() {
   button0.update();
   button1.update();    
@@ -400,12 +369,24 @@ void loop() {
   button8.update();
   button9.update();
   buttongo.update();
+  buttonq21.update();
+  buttonq22.update();
+  buttonq23.update();
 
   if  (buttonPushed) {
     buttonPushed = 0;
     doMultiplexedButtons(); 
   }
 
+  if (buttonq21.fallingEdge()) {
+    processPress(8, "x");
+  }
+  if (buttonq21.fallingEdge()) {
+    processPress(9, "y");
+  }
+  if (buttonq21.fallingEdge()) {
+    processPress(10, "z");
+  }
   if (button0.fallingEdge()) {
     processPress(11, "1");
   }
