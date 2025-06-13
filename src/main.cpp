@@ -110,41 +110,74 @@ void turnLedOff (byte position) {
   }  
 }
 
-void checkQuestion(byte position, byte reset) {
-  byte q1 = 0;
-  byte q2 = 0;
-  byte q3 = 0;
-
+byte whatQuestion (byte position) {
   if (position <= 7) {
-    // Eerste vraag, meerdere mogelijk.
-    // niks doen nog?
-    for (byte i=0;i<=7;i++) {
-      if (pInfoActive[i]) {
-        q1++;
-      }
-    }
+    return 1;
   } else if (position <= 10) {
-    // Tweede vraag, eentje mogelijk.
-    /*for (byte i=8;i<=10;i++) {
-      pInfoActive[i] = 0;
-      turnLedOff(i);
-      if (pInfoActive[i]) {
-        q2++;
-      }
-    }*/
+    return 2;
   } else if (position <= 21) {
-    // Cijfer, eentje mogelijk.
-    for (byte i=11;i<=20;i++) {
-      pInfoActive[i] = 0;
-      turnLedOff(i);
-      if (pInfoActive[i]) {
-        q3++;
-      }
+    return 3;
+  } else {
+    return 0; // not good :)
+  }
+}
+
+// Functie die een hoop werk doet voor de 'logica' van het ding.
+// Wil dat hij na elke knopdruk controleert of 
+// Vraag 1 correct is (1 of meer antwoorden)
+// Vraag 2 correct, 1 antwoord
+// Vraag 3 correct, 1 antwoord.
+// Als dat allemaal klopt led 21 aanzetten.
+byte checkQuestion(byte position) {
+  byte answerCount[] = {0,0,0,0};
+
+  // Eerste vraag, meerdere mogelijk.
+  for (byte i=0;i<=7;i++) {
+    if (pInfoActive[i]) {
+      answerCount[1]++;
     }
   }
-  // Dit moet nog, als een van deze knoppen aangesloten is moet q2 ook 1 zijn.
-  if (q1 > 0 && q2 == 0 && q3 == 1) {
-    turnLedOn(21); // BUTTONGOLED
+  
+  // Tweede vraag, eentje mogelijk.
+  for (byte i=8;i<=10;i++) {
+    if (8 <= position && position <= 10) {
+      pInfoActive[i] = 0;
+    }
+    turnLedOff(i);
+    if (pInfoActive[i]) {
+      answerCount[2]++;
+    }
+  }
+
+  // Cijfer, eentje mogelijk.
+  for (byte i=11;i<=20;i++) {
+    pInfoActive[i] = 0;
+    turnLedOff(i);
+    if (pInfoActive[i]) {
+      answerCount[3]++;
+    }
+  }
+  
+  answerCount[whatQuestion(position)]++;
+ 
+  if (answerCount[1] > 0 && answerCount[2] == 1 && answerCount[3] == 1) {
+    turnLedOn(BUTTONGOLED);
+    Serial.print("Good: ");
+    Serial.print(answerCount[1]);
+    Serial.print(" ");
+    Serial.print(answerCount[2]);
+    Serial.print(" ");
+    Serial.println(answerCount[3]);
+    return 1;
+  } else {
+    turnLedOff(BUTTONGOLED);
+    Serial.print("Bad: ");
+    Serial.print(answerCount[1]);
+    Serial.print(" ");
+    Serial.print(answerCount[2]);
+    Serial.print(" ");
+    Serial.println(answerCount[3]);
+    return 0;
   }
 }
 
@@ -166,23 +199,26 @@ void disco() {
 }
 
 void processPress(byte position, const char* output) {
+  checkQuestion(position);
   if (pInfoActive[position]) {
     Serial.print("Button ");
     Serial.print(position);
     Serial.print(" pressed, deactivated.");
     turnLedOff(position);
-    pInfoActive[position] = 0;  
+    pInfoActive[position] = 0;
+    Keyboard.print(millis()/10);
+    Keyboard.print("-");
+    Keyboard.println(output);
   } else {
     Serial.print("Button ");
     Serial.print(position);
     Serial.print(" pressed, output: ");
     Serial.println(output);
-    checkQuestion(position, 0);
     turnLedOn(position);
     pInfoActive[position] = 1;
     Keyboard.print(millis()/10);
     Keyboard.print(" ");
-    Keyboard.println(output);    
+    Keyboard.println(output);
   }
 }
 
@@ -375,13 +411,13 @@ void loop() {
   }
 
   if (buttonq21.fallingEdge()) {
-    processPress(8, "x");
+    processPress(8, ".");
   }
   if (buttonq22.fallingEdge()) {
-    processPress(9, "y");
+    processPress(9, ">");
   }
   if (buttonq23.fallingEdge()) {
-    processPress(10, "z");
+    processPress(10, "?");
   }
   if (button0.fallingEdge()) {
     processPress(11, "1");
@@ -415,6 +451,7 @@ void loop() {
   }
   if (buttongo.fallingEdge()) {
     processPress(21, "!");    
+    // Hele status van de knoppen sturen.
     disco();
   }
 }
