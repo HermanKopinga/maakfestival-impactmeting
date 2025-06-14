@@ -163,7 +163,7 @@ byte checkQuestion(byte position) {
   answerCount[whatQuestion(position)]++;
  
   if (answerCount[1] > 0 && answerCount[2] == 1 && answerCount[3] == 1) {
-    turnLedOn(BUTTONGOLED);
+    turnLedOn(21);
     Serial.print("Good: ");
     Serial.print(answerCount[1]);
     Serial.print(" ");
@@ -172,7 +172,7 @@ byte checkQuestion(byte position) {
     Serial.println(answerCount[3]);
     return 1;
   } else {
-    turnLedOff(BUTTONGOLED);
+    turnLedOff(21);
     Serial.print("Bad: ");
     Serial.print(answerCount[1]);
     Serial.print(" ");
@@ -186,7 +186,7 @@ byte checkQuestion(byte position) {
 void disco() {
   // Blink the LEDs a few times before we start:
   for (int i = 0; i < 4; i++) {
-    for (int i = 0; i <= 21; i++) {
+    for (int i = 0; i < numberOfButtons; i++) {
       // Turn off previous LED (if not the first)
       if (i > 0) {
         turnLedOff(i-1);
