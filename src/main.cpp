@@ -369,35 +369,27 @@ void doMultiplexedButtons() {
   Serial.println("intStatus = " + String(intStatus, BIN));
 
   if (intStatus & (1 << SX1509_BUTTON1BUTTON)) {
-    Serial.println("Button 1 pressed!");
     processPress(0, "a"); 
   }
   if (intStatus & (1 << SX1509_BUTTON2BUTTON)) {
-    Serial.println("Button 2 pressed!");
     processPress(1, "b");  
   }
   if (intStatus & (1 << SX1509_BUTTON3BUTTON)) {
-    Serial.println("Button 3 pressed!");
     processPress(2, "c");         
   }
   if (intStatus & (1 << SX1509_BUTTON4BUTTON)) {
-    Serial.println("Button 4 pressed!");
     processPress(3, "d");  
   }
   if (intStatus & (1 << SX1509_BUTTON5BUTTON)) {
-    Serial.println("Button 5 pressed!");
     processPress(4, "e");   
   }
   if (intStatus & (1 << SX1509_BUTTON6BUTTON)) {
-    Serial.println("Button 6 pressed!");
     processPress(5, "f");    
   }
   if (intStatus & (1 << SX1509_BUTTON7BUTTON)) {
-    Serial.println("Button 7 pressed!");
     processPress(6, "g");  
   }
   if (intStatus & (1 << SX1509_BUTTON8BUTTON)) {
-    Serial.println("Button 8 pressed!");
     processPress(7, "h"); 
   }
 }
