@@ -90,6 +90,7 @@ const byte sourceDirect = 0;
 byte pInfoActive[numberOfButtons];
 byte pInfoPin[numberOfButtons] = {SX1509_BUTTON1LED,SX1509_BUTTON2LED,SX1509_BUTTON3LED,SX1509_BUTTON4LED,SX1509_BUTTON5LED,SX1509_BUTTON6LED,SX1509_BUTTON7LED,SX1509_BUTTON8LED,BUTTONQ21LED,BUTTONQ22LED,BUTTONQ23LED,BUTTON1LED,BUTTON2LED,BUTTON3LED,BUTTON4LED,BUTTON5LED,BUTTON6LED,BUTTON7LED,BUTTON8LED,BUTTON9LED,BUTTON10LED,BUTTONGOLED};
 byte pInfoSource[numberOfButtons] = {sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceSX1509,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect,sourceDirect};
+char pInfoOutput[numberOfButtons] = {'a','b','c','d','e','f','g','h','.','>','?','1','2','3','4','5','6','7','8','9','x','!'};
 
 void turnLedOn (byte position) {
   pInfoActive[position] = 1;
@@ -114,7 +115,7 @@ byte whatQuestion (byte position) {
     return 1;
   } else if (position <= 10) {
     return 2;
-  } else if (position <= 21) {
+  } else if (position <= 20) {
     return 3;
   } else {
     return 0; // not good :)
@@ -152,8 +153,8 @@ byte checkQuestion(byte position) {
   for (byte i=11;i<=20;i++) {
     if (whatQuestion(position) == 3) {
       pInfoActive[i] = 0;
+      turnLedOff(i);
     }
-    turnLedOff(i);
     if (pInfoActive[i]) {
       answerCount[3]++;
     }
@@ -459,11 +460,19 @@ void loop() {
     processPress(19, "9");     
   }
   if (button9.fallingEdge()) {
-    processPress(20, "10");    
+    processPress(20, "x");    
   }
   if (buttongo.fallingEdge()) {
     processPress(21, "!");    
     // Hele status van de knoppen sturen.
+    Keyboard.print(millis());
+    Keyboard.print(" # ");
+    for (byte i = 0; i < numberOfButtons; i++) {
+      if (pInfoActive[i]) {  
+        Keyboard.print(pInfoOutput[i]);
+      }
+    }
+    Keyboard.println();
     disco();
   }
 }
