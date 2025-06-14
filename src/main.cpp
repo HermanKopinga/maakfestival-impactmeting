@@ -128,7 +128,7 @@ byte whatQuestion (byte position) {
 // Vraag 2 correct, 1 antwoord
 // Vraag 3 correct, 1 antwoord.
 // Als dat allemaal klopt led 21 aanzetten.
-byte checkQuestion(byte position) {
+byte checkQuestion(byte position, byte active) {
   byte answerCount[] = {0,0,0,0};
 
   // Eerste vraag, meerdere mogelijk.
@@ -137,7 +137,11 @@ byte checkQuestion(byte position) {
       answerCount[1]++;
     }
   }
-  
+  if (whatQuestion(position) == 1 && active == 1) {
+    // Nu actief, betekent dat we hem naar uit gaan zetten, dus deze vraag heeft 1 antwoord minder.
+    answerCount[1]--;
+  }
+
   // Tweede vraag, eentje mogelijk.
   for (byte i=8;i<=10;i++) {
     if (whatQuestion(position) == 2) {
@@ -160,7 +164,9 @@ byte checkQuestion(byte position) {
     }
   }
   
-  answerCount[whatQuestion(position)]++;
+  if (!active) {
+    answerCount[whatQuestion(position)]++;
+  }
  
   if (answerCount[1] > 0 && answerCount[2] == 1 && answerCount[3] == 1) {
     turnLedOn(21);
@@ -209,7 +215,7 @@ void printState() {
 }
 
 void processPress(byte position, const char* output) {
-  checkQuestion(position);
+  checkQuestion(position, pInfoActive[position]);
   if (pInfoActive[position]) {
     turnLedOff(position);
     pInfoActive[position] = 0;
